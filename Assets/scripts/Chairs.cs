@@ -57,5 +57,9 @@ public class Chairs : MonoBehaviour
     {
         CrearSillas();
     }
+    public List<GameObject> GetSillas()
+    {
+        return sillas;
+    }
 }
 

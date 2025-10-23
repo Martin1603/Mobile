@@ -50,4 +50,10 @@ public class PlayerSitControl : MonoBehaviour
     {
         return isSitting;
     }
+
+    public void Morir()
+    {
+        // Aquí puedes poner una animación de muerte o simplemente desactivar el objeto
+        gameObject.SetActive(false);
+    }
 }
