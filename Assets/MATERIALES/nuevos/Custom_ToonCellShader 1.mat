@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: Custom_ToonCellShader 1
   m_Shader: {fileID: 4800000, guid: 40a3604ad426a2f4ba98eb3afb93a165, type: 3}
-  m_Parent: {fileID: 0}
+  m_Parent: {fileID: 2100000, guid: f70911f58f5ab56478f3ee032d378cfd, type: 2}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
