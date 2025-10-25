@@ -257,7 +257,6 @@ MonoBehaviour:
   padre: {fileID: 144636834}
   prefabSillas: {fileID: 6589869212739958158, guid: c30754a4318ee554bab6989d72723b4c,
     type: 3}
-  sillas: []
 --- !u!4 &144636834
 Transform:
   m_ObjectHideFlags: 0
@@ -286,16 +285,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chairsScript: {fileID: 144636833}
+  spawner: {fileID: 0}
   player: {fileID: 0}
-  npcs:
-  - {fileID: 0}
+  npcs: []
   playerSpawn: {fileID: 0}
-  npcSpawns:
-  - {fileID: 0}
+  npcSpawns: []
   totalRondas: 8
-  radioInicial: 7
+  radioInicial: 5
   sillasIniciales: 8
-  incrementoRadio: -1
+  incrementoRadio: 2
   tiempoEntreRondas: 3
 --- !u!114 &144636836
 MonoBehaviour:
@@ -309,16 +307,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c024d53439ffd24997a83e7de0df365, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 6193245400765404066, guid: 0f17f7168dcad6c4c9c8249bda470091,
+  prefabNPC: {fileID: 505795846734900244, guid: f09aebc299e36a148a741070307ebbfa,
     type: 3}
-  npcPrefab: {fileID: 505795846734900244, guid: f09aebc299e36a148a741070307ebbfa,
+  prefabPlayer: {fileID: 6193245400765404066, guid: 0f17f7168dcad6c4c9c8249bda470091,
     type: 3}
   cantidadNPCs: 8
-  radioGeneracion: 15
-  musicaRonda: {fileID: 0}
-  playerGenerado: {fileID: 0}
-  npcsGenerados: []
+  radio: 15
+  alturaAjuste: 0.5
   posicionesIniciales: []
+  gameManager: {fileID: 144636835}
 --- !u!1 &212160434
 GameObject:
   m_ObjectHideFlags: 0
@@ -1032,14 +1029,14 @@ RectTransform:
   m_GameObject: {fileID: 1083825034}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.71998113, y: 0.71998113, z: 0.71998113}
+  m_LocalScale: {x: 0.26815698, y: 0.26815698, z: 0.26815698}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 212160435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 40.6, y: 40.5}
+  m_AnchoredPosition: {x: 4.112995, y: 4.5429993}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1083825036
@@ -1292,14 +1289,14 @@ RectTransform:
   m_GameObject: {fileID: 1657876995}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.71998113, y: 0.71998113, z: 0.71998113}
+  m_LocalScale: {x: 0.26815698, y: 0.26815698, z: 0.26815698}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 212160435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 3.2418218, y: 6.015992}
+  m_AnchoredPosition: {x: -9.8, y: -8.3}
   m_SizeDelta: {x: 200, y: 200}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &1657876997

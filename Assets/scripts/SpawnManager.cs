@@ -10,16 +10,19 @@ public class SpawnerPersonajes : MonoBehaviour
     [Header("Configuracion")]
     public int cantidadNPCs = 8;
     public float radio = 5f;
-    public float alturaAjuste = 1f; // Ajuste para evitar que se genere bajo el terreno
+    public float alturaAjuste = 1f;
 
     [HideInInspector] public List<Transform> posicionesIniciales = new List<Transform>();
+
+    [Header("Referencia al GameManager")]
+    public GameManager gameManager; // <-- lo enlazamos desde el inspector
 
     void Start()
     {
         GenerarPersonajes();
     }
 
-    void GenerarPersonajes()
+    public void GenerarPersonajes()
     {
         if (prefabNPC == null || prefabPlayer == null)
         {
@@ -27,33 +30,36 @@ public class SpawnerPersonajes : MonoBehaviour
             return;
         }
 
-        // Borrar posiciones anteriores si existen
+        // Borrar anteriores
         foreach (Transform t in posicionesIniciales)
         {
             if (t != null) Destroy(t.gameObject);
         }
         posicionesIniciales.Clear();
 
-        // Generar NPCs en círculo
+        // Lista para el GameManager
+        List<Transform> npcSpawns = new List<Transform>();
+
+        // Generar NPCs
         for (int i = 0; i < cantidadNPCs; i++)
         {
             float angulo = i * Mathf.PI * 2 / (cantidadNPCs + 1);
-            Vector3 posicion = new Vector3(Mathf.Cos(angulo), 0, Mathf.Sin(angulo)) * radio;
-            posicion += transform.position;
+            Vector3 posicion = new Vector3(Mathf.Cos(angulo), 0, Mathf.Sin(angulo)) * radio + transform.position;
             posicion.y = ObtenerAlturaTerreno(posicion) + alturaAjuste;
 
             GameObject npc = Instantiate(prefabNPC, posicion, Quaternion.identity);
             npc.name = "NPC_" + (i + 1);
 
+            // Crear punto de spawn
             Transform punto = new GameObject("PuntoNPC_" + (i + 1)).transform;
             punto.position = posicion;
+            npcSpawns.Add(punto);
             posicionesIniciales.Add(punto);
         }
 
-        // Generar jugador (Player)
+        // Generar jugador
         float anguloPlayer = Mathf.PI * 2 / (cantidadNPCs + 1) * cantidadNPCs;
-        Vector3 posicionPlayer = new Vector3(Mathf.Cos(anguloPlayer), 0, Mathf.Sin(anguloPlayer)) * radio;
-        posicionPlayer += transform.position;
+        Vector3 posicionPlayer = new Vector3(Mathf.Cos(anguloPlayer), 0, Mathf.Sin(anguloPlayer)) * radio + transform.position;
         posicionPlayer.y = ObtenerAlturaTerreno(posicionPlayer) + alturaAjuste;
 
         GameObject player = Instantiate(prefabPlayer, posicionPlayer, Quaternion.identity);
@@ -63,7 +69,24 @@ public class SpawnerPersonajes : MonoBehaviour
         puntoPlayer.position = posicionPlayer;
         posicionesIniciales.Add(puntoPlayer);
 
-        Debug.Log("Se generaron todos los personajes correctamente.");
+        // Pasar los datos al GameManager automáticamente
+        if (gameManager != null)
+        {
+            gameManager.player = player.transform;
+            gameManager.playerSpawn = puntoPlayer;
+            gameManager.npcs = new List<Transform>();
+            gameManager.npcSpawns = npcSpawns;
+
+            // Agregar referencias de NPCs
+            foreach (Transform npcTransform in npcSpawns)
+            {
+                GameObject npc = GameObject.Find(npcTransform.name.Replace("Punto", ""));
+                if (npc != null)
+                    gameManager.npcs.Add(npc.transform);
+            }
+        }
+
+        Debug.Log("Se generaron todos los personajes y se asignaron al GameManager.");
     }
 
     float ObtenerAlturaTerreno(Vector3 posicion)
@@ -73,6 +96,6 @@ public class SpawnerPersonajes : MonoBehaviour
         {
             return hit.point.y;
         }
-        return transform.position.y; // Si no golpea el terreno, usa el Y del spawner
+        return transform.position.y;
     }
 }

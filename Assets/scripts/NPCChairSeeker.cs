@@ -23,7 +23,16 @@ public class NPCChairSeeker : MonoBehaviour
             return;
         }
 
-        StartCoroutine(FindAndGoToChair());
+        // NO iniciar la búsqueda aquí. Esperar a que GameManager llame BeginSearch().
+    }
+
+    // Nuevo método público para que GameManager inicie la búsqueda cuando convenga
+    public void BeginSearch()
+    {
+        if (!buscandoSilla && !sitControl.IsSitting())
+        {
+            StartCoroutine(FindAndGoToChair());
+        }
     }
 
     private IEnumerator FindAndGoToChair()
