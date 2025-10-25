@@ -49,14 +49,16 @@ public class GameManager : MonoBehaviour
         // Reiniciar posiciones
         ReiniciarPosiciones();
 
-        Debug.Log("Ronda " + rondaActual + " iniciada con " + chairsScript.nSillas + " sillas.");
-
-        // Asegurar que los enemigos vuelvan a monitorear
+        // **Reiniciar la bandera de los Enemy para permitir ejecutar la corutina nuevamente**
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {
-            enemy.StopAllCoroutines();
+            enemy.ReiniciarRonda();
+            enemy.StopAllCoroutines(); // opcional, para asegurarnos que no quede nada corriendo de rondas previas
         }
+
+        Debug.Log("Ronda " + rondaActual + " iniciada con " + chairsScript.nSillas + " sillas.");
     }
+
 
     public void TerminarRonda()
     {
