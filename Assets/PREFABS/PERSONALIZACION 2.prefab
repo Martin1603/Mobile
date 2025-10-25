@@ -3575,7 +3575,7 @@ MonoBehaviour:
   partes:
   - nombre: gorras
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 7472480998644485575}
     - {fileID: 2964580811082556107}
     - {fileID: 8527059127408511269}
@@ -3584,14 +3584,14 @@ MonoBehaviour:
     indice: 0
   - nombre: bigotes
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 4748982777217222123}
     - {fileID: 3158299791059627387}
     - {fileID: 7115027785715485866}
     indice: 0
   - nombre: dientes
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 8917768698394793039}
     - {fileID: 2408645804923064697}
     - {fileID: 7559963972771207441}
@@ -3601,7 +3601,7 @@ MonoBehaviour:
     indice: 0
   - nombre: gafas
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 7740764965997925632}
     - {fileID: 3874339812275097135}
     - {fileID: 6156048788124124151}
@@ -3609,7 +3609,7 @@ MonoBehaviour:
     indice: 0
   - nombre: cabello
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 6040216523130364677}
     - {fileID: 2770678578375850531}
     - {fileID: 2825077095444804358}
@@ -4152,6 +4152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   velocidad: 0.4
   amplitud: 0.1
+  escenaDesactivar: EscenaMartin
 --- !u!114 &2262497065053083044
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4167,7 +4168,7 @@ MonoBehaviour:
   grupos:
   - nombreGrupo: gorras
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 7472480998644485575}
     - {fileID: 2964580811082556107}
     - {fileID: 8527059127408511269}
@@ -4183,7 +4184,7 @@ MonoBehaviour:
     - {fileID: 2100000, guid: 94b9e7efe58343049b3ad2d68a5a1c36, type: 2}
   - nombreGrupo: bigotes
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 4748982777217222123}
     - {fileID: 3158299791059627387}
     - {fileID: 7115027785715485866}
@@ -4209,7 +4210,7 @@ MonoBehaviour:
     - {fileID: 2100000, guid: 94b9e7efe58343049b3ad2d68a5a1c36, type: 2}
   - nombreGrupo: gafas
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 7740764965997925632}
     - {fileID: 3874339812275097135}
     - {fileID: 6156048788124124151}
@@ -4224,7 +4225,7 @@ MonoBehaviour:
     - {fileID: 2100000, guid: 94b9e7efe58343049b3ad2d68a5a1c36, type: 2}
   - nombreGrupo: cabello
     objetos:
-    - {fileID: 0}
+    - {fileID: 4348280364879122169}
     - {fileID: 6040216523130364677}
     - {fileID: 2770678578375850531}
     - {fileID: 2825077095444804358}
