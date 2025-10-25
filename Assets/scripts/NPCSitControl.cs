@@ -6,6 +6,7 @@ public class NPCSitControl : MonoBehaviour
 {
     private Rigidbody rb;
     public bool isSitting = false;
+    public Animator animator;
 
     void Start()
     {
@@ -35,6 +36,8 @@ public class NPCSitControl : MonoBehaviour
             agent.isStopped = true;
             agent.enabled = false;
         }
+
+        animator.SetBool("sentado", true);
     }
 
     public void StandUp()
@@ -56,6 +59,8 @@ public class NPCSitControl : MonoBehaviour
             agent.enabled = true;
             agent.isStopped = false;
         }
+
+        animator.SetBool("sentado", false);
     }
 
     public bool IsSitting()

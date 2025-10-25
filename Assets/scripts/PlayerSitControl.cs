@@ -7,6 +7,7 @@ public class PlayerSitControl : MonoBehaviour
     private PlayerMovement playerMovement;
     private Rigidbody rb;
     public bool isSitting = false;
+    public Animator animator;
 
     void Start()
     {
@@ -34,6 +35,8 @@ public class PlayerSitControl : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
+
+        animator.SetBool("sentado", true);
     }
 
     public void StandUp()
@@ -44,6 +47,9 @@ public class PlayerSitControl : MonoBehaviour
 
         if (rb != null)
             rb.constraints = RigidbodyConstraints.None;
+
+        animator.SetBool("sentado", false);
+
     }
 
     public bool IsSitting()
