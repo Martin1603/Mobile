@@ -1,16 +1,15 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    // Start is called before the first frame update
-    [Header("Configuración")]
-    public float tiempoAntesDeMatar = 2f; // Tiempo de espera antes de eliminar a los que no se sentaron
-    public float tiempoAntesDeReiniciar = 3f; // Tiempo antes de que se reinicie la ronda
+    [Header("Configuracion")]
+    public float tiempoAntesDeMatar = 2f;
+    public float tiempoAntesDeReiniciar = 3f;
 
     private GameManager gameManager;
     private Chairs chairsScript;
+    private bool rondaEnProgreso = false;
 
     void Start()
     {
@@ -20,11 +19,9 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
-        // Si todas las sillas están ocupadas, empieza el proceso de eliminación
-        if (TodasLasSillasOcupadas())
+        if (!rondaEnProgreso && TodasLasSillasOcupadas())
         {
             StartCoroutine(MatarYReiniciar());
-            enabled = false; // Desactiva este script hasta la próxima ronda
         }
     }
 
@@ -36,42 +33,53 @@ public class Enemy : MonoBehaviour
         {
             ChairSeat seat = silla.GetComponent<ChairSeat>();
             if (seat != null && !seat.IsOccupied())
-            {
-                return false; // Aún hay sillas disponibles
-            }
+                return false;
         }
         return true;
     }
 
     private IEnumerator MatarYReiniciar()
     {
+        rondaEnProgreso = true;
+
         yield return new WaitForSeconds(tiempoAntesDeMatar);
 
-        // Buscar todos los NPCs y el Player que no estén sentados
         NPCSitControl[] npcs = FindObjectsOfType<NPCSitControl>();
         PlayerSitControl player = FindObjectOfType<PlayerSitControl>();
 
+        // Matar a los que no esten sentados
         foreach (var npc in npcs)
         {
             if (!npc.IsSitting())
-            {
                 npc.Morir();
-            }
         }
 
         if (player != null && !player.IsSitting())
-        {
             player.Morir();
-        }
 
         yield return new WaitForSeconds(tiempoAntesDeReiniciar);
 
-        // Llamar al GameManager para terminar la ronda
+        // Levantar a los que sobrevivieron
+        foreach (var npc in npcs)
+        {
+            if (npc != null && npc.gameObject.activeSelf && npc.IsSitting())
+                npc.StandUp();
+        }
+
+        // Reactivar busqueda de silla
+        NPCChairSeeker[] seekers = FindObjectsOfType<NPCChairSeeker>();
+        foreach (var seeker in seekers)
+        {
+            if (seeker != null && seeker.gameObject.activeSelf)
+                seeker.ResetChairSearch();
+        }
+
+        // Llamar al GameManager
         if (gameManager != null)
             gameManager.TerminarRonda();
 
-        // Reactivar el script para la próxima ronda
+        // Espera breve antes de reactivar monitoreo
         yield return new WaitForSeconds(1f);
-        enabled = true;
+        rondaEnProgreso = false;
     }
 }

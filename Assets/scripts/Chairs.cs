@@ -18,7 +18,7 @@ public class Chairs : MonoBehaviour
             // Calcula una posición en círculo
             Vector3 p = new Vector3(
                 Mathf.Sin(i * 2 * Mathf.PI / nSillas),
-                -0.1f,
+                0,
                 Mathf.Cos(i * 2 * Mathf.PI / nSillas)
             ) * radio;
 

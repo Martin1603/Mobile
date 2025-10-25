@@ -564,6 +564,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8588238562466949968, guid: f09aebc299e36a148a741070307ebbfa,
         type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8588238562466949968, guid: f09aebc299e36a148a741070307ebbfa,
+        type: 3}
       propertyPath: m_TagString
       value: NPC
       objectReference: {fileID: 0}
@@ -1733,7 +1738,7 @@ MonoBehaviour:
   m_OverrideVoxelSize: 0
   m_VoxelSize: 0.16666667
   m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 23800000, guid: 91f3c26fa5dd39842b88c6590751d8df, type: 2}
+  m_NavMeshData: {fileID: 23800000, guid: f1ea5c9afbd9c114c93c91b55e0d825e, type: 2}
   m_BuildHeightMesh: 0
 --- !u!4 &1521641880
 Transform:
