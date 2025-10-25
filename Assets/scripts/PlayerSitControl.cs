@@ -6,7 +6,7 @@ public class PlayerSitControl : MonoBehaviour
 {
     private PlayerMovement playerMovement;
     private Rigidbody rb;
-    private bool isSitting = false;
+    public bool isSitting = false;
 
     void Start()
     {
@@ -53,6 +53,7 @@ public class PlayerSitControl : MonoBehaviour
 
     public void Morir()
     {
+        Debug.LogWarning($"MORIR() llamado desde: {new System.Diagnostics.StackTrace()}");
         // Aquí puedes poner una animación de muerte o simplemente desactivar el objeto
         gameObject.SetActive(false);
     }

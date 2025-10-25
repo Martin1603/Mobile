@@ -8,7 +8,7 @@ public class Chairs : MonoBehaviour
     public float radio;                // Radio del círculo donde se ubicarán las sillas
     public Transform padre;            // Objeto padre para organizar las sillas en la jerarquía
     public GameObject prefabSillas;    // Prefab de la silla a instanciar
-    private List<GameObject> sillas = new List<GameObject>(); // Lista que almacena las sillas creadas
+    public List<GameObject> sillas = new List<GameObject>(); // Lista que almacena las sillas creadas
 
     // 🔹 Crea las sillas en círculo alrededor del punto (0,0,0) o del objeto padre si existe
     public void CrearSillas()
@@ -18,7 +18,7 @@ public class Chairs : MonoBehaviour
             // Calcula una posición en círculo
             Vector3 p = new Vector3(
                 Mathf.Sin(i * 2 * Mathf.PI / nSillas),
-                -0.1f,
+                0,
                 Mathf.Cos(i * 2 * Mathf.PI / nSillas)
             ) * radio;
 

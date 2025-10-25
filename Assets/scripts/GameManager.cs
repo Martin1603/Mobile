@@ -1,22 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class GameManager : MonoBehaviour
 {
     [Header("Referencias")]
-    public Chairs chairsScript;              // Referencia al script de las sillas
-    public Transform player;                 // Referencia al jugador
-    public List<Transform> npcs;             // Lista de NPCs a reiniciar
-    public Transform playerSpawn;            // Punto de reinicio del jugador
-    public List<Transform> npcSpawns;        // Puntos de reinicio de cada NPC
+    public Chairs chairsScript;
+    public Transform player;
+    public List<Transform> npcs;
+    public Transform playerSpawn;
+    public List<Transform> npcSpawns;
 
-    [Header("Configuración de Rondas")]
-    public int totalRondas = 7;              // Total de rondas del juego
-    public float radioInicial = 5f;          // Radio base para la primera ronda
-    public int sillasIniciales = 8;          // Número de sillas en la primera ronda
-    public float incrementoRadio = 2f;       // Cuánto aumenta el radio por ronda
-    public float tiempoEntreRondas = 3f;     // Tiempo antes de iniciar una nueva ronda
+    [Header("Configuracion de Rondas")]
+    public int totalRondas = 7;
+    public float radioInicial = 5f;
+    public int sillasIniciales = 8;
+    public float incrementoRadio = 2f;
+    public float tiempoEntreRondas = 3f;
 
     private int rondaActual = 1;
     private bool rondaEnCurso = false;
@@ -26,7 +27,6 @@ public class GameManager : MonoBehaviour
         IniciarRonda();
     }
 
-    // 🔹 Inicia una nueva ronda
     public void IniciarRonda()
     {
         if (rondaActual > totalRondas)
@@ -37,7 +37,10 @@ public class GameManager : MonoBehaviour
 
         rondaEnCurso = true;
 
-        // Configurar sillas para esta ronda
+        // Asegurar que todos se levanten
+        LevantarTodos();
+
+        // Limpiar y crear nuevas sillas
         chairsScript.EliminarSillas();
         chairsScript.nSillas = sillasIniciales - (rondaActual - 1);
         chairsScript.radio = radioInicial + (rondaActual - 1) * incrementoRadio;
@@ -46,41 +49,86 @@ public class GameManager : MonoBehaviour
         // Reiniciar posiciones
         ReiniciarPosiciones();
 
-        Debug.Log("▶️ Ronda " + rondaActual + " iniciada con " + chairsScript.nSillas + " sillas.");
+        // **Reiniciar la bandera de los Enemy para permitir ejecutar la corutina nuevamente**
+        foreach (Enemy enemy in FindObjectsOfType<Enemy>())
+        {
+            enemy.ReiniciarRonda();
+            enemy.StopAllCoroutines(); // opcional, para asegurarnos que no quede nada corriendo de rondas previas
+        }
+
+        Debug.Log("Ronda " + rondaActual + " iniciada con " + chairsScript.nSillas + " sillas.");
     }
 
-    // 🔹 Termina la ronda y programa la siguiente
+
     public void TerminarRonda()
     {
         if (!rondaEnCurso)
             return;
 
         rondaEnCurso = false;
+        Debug.Log("Ronda " + rondaActual + " terminada.");
 
-        Debug.Log("🏁 Ronda " + rondaActual + " terminada.");
         rondaActual++;
-
         StartCoroutine(SiguienteRonda());
     }
 
-    // 🔹 Espera un tiempo antes de comenzar la siguiente ronda
     private IEnumerator SiguienteRonda()
     {
         yield return new WaitForSeconds(tiempoEntreRondas);
         IniciarRonda();
     }
 
-    // 🔹 Reinicia al jugador y NPCs a sus posiciones originales
+    private void LevantarTodos()
+    {
+        // Jugador
+        if (player != null)
+        {
+            var playerSit = player.GetComponent<PlayerSitControl>();
+            if (playerSit != null)
+                playerSit.StandUp();
+
+            var rb = player.GetComponent<Rigidbody>();
+            if (rb != null)
+                rb.constraints = RigidbodyConstraints.None;
+        }
+
+        // NPCs
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+
+            var npcSit = npc.GetComponent<NPCSitControl>();
+            if (npcSit != null)
+                npcSit.StandUp();
+
+            var agent = npc.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agent.enabled = true;
+                agent.isStopped = false;
+            }
+
+            var rb = npc.GetComponent<Rigidbody>();
+            if (rb != null)
+                rb.constraints = RigidbodyConstraints.None;
+        }
+    }
+
     private void ReiniciarPosiciones()
     {
-        // Reinicia el jugador
         if (player != null && playerSpawn != null)
         {
             player.position = playerSpawn.position;
             player.rotation = playerSpawn.rotation;
+
+            var rb = player.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+            }
         }
 
-        // Reinicia los NPCs
         for (int i = 0; i < npcs.Count; i++)
         {
             if (npcs[i] != null && i < npcSpawns.Count && npcSpawns[i] != null)
@@ -88,7 +136,13 @@ public class GameManager : MonoBehaviour
                 npcs[i].position = npcSpawns[i].position;
                 npcs[i].rotation = npcSpawns[i].rotation;
 
-                // Si tienen scripts de comportamiento, los reinicia
+                var rb = npcs[i].GetComponent<Rigidbody>();
+                if (rb != null)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
+
                 var seeker = npcs[i].GetComponent<NPCChairSeeker>();
                 if (seeker != null)
                     seeker.ResetChairSearch();
