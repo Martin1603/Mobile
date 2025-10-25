@@ -5,9 +5,10 @@ using UnityEngine.UI;
 
 public class UIpersonalizarObjetos : MonoBehaviour
 {
-
+    public string nombre = "Default";
     public accesorios cuerpoPersonalizable;
     public Text txtUnidades;
+    public Text txtNombre;
     public int indice;
 
 
@@ -18,6 +19,7 @@ public class UIpersonalizarObjetos : MonoBehaviour
     void Start()
     {
         ActualizarTexto();
+        txtNombre.text = cuerpoPersonalizable.partes[indice].nombre;
     }
 
     public void Siguiente()

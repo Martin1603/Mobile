@@ -28,6 +28,7 @@ public class accesorios : MonoBehaviour
 [System.Serializable]
 public class GrupoObjetos
 {
+    public string nombre = "Default";
     public GameObject[] objetos;
     public int indice;
 
