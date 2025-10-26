@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
         Vector3 centro = chairsScript.transform.position;
         float tiempoRotacion = Random.Range(2f, 5f);
         float tiempoTranscurrido = 0f;
-        float velocidadRotacion = 30f;
+        float velocidadRotacion = 15f;
 
         // Desactiva el movimiento del jugador
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();

@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   nSillas: 8
-  radio: 3
+  radio: 8
   padre: {fileID: 144636834}
   prefabSillas: {fileID: 6589869212739958158, guid: c30754a4318ee554bab6989d72723b4c,
     type: 3}
@@ -291,9 +291,9 @@ MonoBehaviour:
   playerSpawn: {fileID: 0}
   npcSpawns: []
   totalRondas: 8
-  radioInicial: 5
+  radioInicial: 8
   sillasIniciales: 8
-  incrementoRadio: 2
+  incrementoRadio: -1
   tiempoEntreRondas: 3
 --- !u!114 &144636836
 MonoBehaviour:
@@ -312,7 +312,7 @@ MonoBehaviour:
   prefabPlayer: {fileID: 6193245400765404066, guid: 0f17f7168dcad6c4c9c8249bda470091,
     type: 3}
   cantidadNPCs: 8
-  radio: 15
+  radio: 10
   alturaAjuste: 0.5
   posicionesIniciales: []
   gameManager: {fileID: 144636835}
