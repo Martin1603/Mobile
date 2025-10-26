@@ -9,19 +9,20 @@ public class Enemy : MonoBehaviour
 
     private GameManager gameManager;
     private Chairs chairsScript;
-    private bool rondaEnProgreso = false; // indica si la corutina está activa
-    private bool rondaTerminada = false;  // indica si ya se ejecutó el matar de esta ronda
+    private bool rondaEnProgreso = false;
+    private bool yaEjecutadoEstaRonda = false;
 
-    private void Start()
+    void Start()
     {
         gameManager = FindObjectOfType<GameManager>();
         chairsScript = FindObjectOfType<Chairs>();
     }
 
-    private void Update()
+    void Update()
     {
-        // Solo iniciar la corutina si la ronda no ha terminado
-        if (!rondaEnProgreso && !rondaTerminada && TodasLasSillasOcupadas())
+        if (rondaEnProgreso || yaEjecutadoEstaRonda) return;
+
+        if (TodasLasSillasOcupadas())
         {
             StartCoroutine(MatarYReiniciar());
         }
@@ -44,7 +45,6 @@ public class Enemy : MonoBehaviour
     {
         rondaEnProgreso = true;
 
-        // Espera antes de matar
         yield return new WaitForSeconds(tiempoAntesDeMatar);
 
         NPCSitControl[] npcs = FindObjectsOfType<NPCSitControl>();
@@ -60,7 +60,13 @@ public class Enemy : MonoBehaviour
         if (player != null && !player.IsSitting())
             player.Morir();
 
-        // Espera antes de levantar a los que sobrevivieron (los que estaban sentados)
+        // Avisar al GameManager inmediatamente (una sola vez)
+        if (gameManager != null)
+            gameManager.TerminarRonda();
+
+        yaEjecutadoEstaRonda = true;
+
+        // Esperar y luego levantar sobrevivientes para la próxima ronda
         yield return new WaitForSeconds(tiempoAntesDeReiniciar);
 
         foreach (var npc in npcs)
@@ -71,12 +77,12 @@ public class Enemy : MonoBehaviour
 
         if (player != null && player.gameObject.activeSelf)
         {
-            var playerSit = player.GetComponent<PlayerSitControl>();
-            if (playerSit != null && playerSit.IsSitting())
-                playerSit.StandUp();
+            var ps = player.GetComponent<PlayerSitControl>();
+            if (ps != null && ps.IsSitting())
+                ps.StandUp();
         }
 
-        // Reactivar búsqueda de sillas
+        // Reiniciar búsqueda de sillas
         NPCChairSeeker[] seekers = FindObjectsOfType<NPCChairSeeker>();
         foreach (var seeker in seekers)
         {
@@ -84,18 +90,14 @@ public class Enemy : MonoBehaviour
                 seeker.ResetChairSearch();
         }
 
-        // Llamar a GameManager para terminar la ronda
-        if (gameManager != null)
-            gameManager.TerminarRonda();
-
-        // Marcar que ya se ejecutó el matar de esta ronda
-        rondaTerminada = true;
+        // permitir nueva detección en la próxima ronda (GameManager debe llamar ResetEnemyRound)
         rondaEnProgreso = false;
     }
 
-    // Llamar desde GameManager al iniciar nueva ronda para reiniciar la bandera
-    public void ReiniciarRonda()
+    // Llamar desde GameManager cuando comience una nueva ronda para permitir que el Enemy vuelva a detectar
+    public void ResetForNewRound()
     {
-        rondaTerminada = false;
+        yaEjecutadoEstaRonda = false;
+        rondaEnProgreso = false;
     }
 }

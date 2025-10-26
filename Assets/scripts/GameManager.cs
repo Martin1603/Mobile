@@ -7,13 +7,14 @@ public class GameManager : MonoBehaviour
 {
     [Header("Referencias")]
     public Chairs chairsScript;
+    public SpawnerPersonajes spawner;
     public Transform player;
     public List<Transform> npcs;
     public Transform playerSpawn;
     public List<Transform> npcSpawns;
 
-    [Header("Configuracion de Rondas")]
-    public int totalRondas = 7;
+    [Header("Configuración de Rondas")]
+    public int totalRondas = 8;
     public float radioInicial = 5f;
     public int sillasIniciales = 8;
     public float incrementoRadio = 2f;
@@ -24,6 +25,13 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        StartCoroutine(EsperarYComenzarPrimeraRonda());
+    }
+
+    private IEnumerator EsperarYComenzarPrimeraRonda()
+    {
+        // Espera para asegurarse de que el spawner ya generó todo
+        yield return new WaitForSeconds(0.5f);
         IniciarRonda();
     }
 
@@ -37,28 +45,91 @@ public class GameManager : MonoBehaviour
 
         rondaEnCurso = true;
 
-        // Asegurar que todos se levanten
+        // Levantar personajes que siguen vivos
         LevantarTodos();
 
-        // Limpiar y crear nuevas sillas
+        // Configurar las sillas
         chairsScript.EliminarSillas();
         chairsScript.nSillas = sillasIniciales - (rondaActual - 1);
         chairsScript.radio = radioInicial + (rondaActual - 1) * incrementoRadio;
         chairsScript.CrearSillas();
 
-        // Reiniciar posiciones
+        // Reposicionar personajes
         ReiniciarPosiciones();
 
-        // **Reiniciar la bandera de los Enemy para permitir ejecutar la corutina nuevamente**
+        // Resetear enemigos
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
         {
-            enemy.ReiniciarRonda();
-            enemy.StopAllCoroutines(); // opcional, para asegurarnos que no quede nada corriendo de rondas previas
+            enemy.ResetForNewRound();
         }
 
-        Debug.Log("Ronda " + rondaActual + " iniciada con " + chairsScript.nSillas + " sillas.");
+        // Mirar al centro y bloquear movimiento mientras giran
+        GirarPersonajesAlCentro();
+        StartCoroutine(RotarAntesDeLiberar());
+        Debug.Log($"Ronda {rondaActual} iniciada con {chairsScript.nSillas} sillas.");
     }
 
+    private IEnumerator RotarAntesDeLiberar()
+    {
+        Vector3 centro = chairsScript.transform.position;
+        float tiempoRotacion = Random.Range(2f, 5f);
+        float tiempoTranscurrido = 0f;
+        float velocidadRotacion = 15f;
+
+        // Desactiva el movimiento del jugador
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+            playerMovement.enabled = false;
+
+        // Desactiva los NavMeshAgents de los NPCs
+        List<NavMeshAgent> agentes = new List<NavMeshAgent>();
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+            var agent = npc.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agentes.Add(agent);
+                agent.enabled = false;
+            }
+        }
+
+        // Giran alrededor del centro
+        while (tiempoTranscurrido < tiempoRotacion)
+        {
+            float step = velocidadRotacion * Time.deltaTime;
+
+            if (player != null)
+                player.RotateAround(centro, Vector3.up, step);
+
+            foreach (Transform npc in npcs)
+            {
+                if (npc != null)
+                    npc.RotateAround(centro, Vector3.up, step);
+            }
+
+            tiempoTranscurrido += Time.deltaTime;
+            yield return null;
+        }
+
+        // Activa movimiento y agentes nuevamente
+        if (playerMovement != null)
+            playerMovement.enabled = true;
+
+        foreach (var a in agentes)
+        {
+            if (a != null) a.enabled = true;
+        }
+
+        // Inicia la búsqueda de sillas de los NPCs
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+            var seeker = npc.GetComponent<NPCChairSeeker>();
+            if (seeker != null)
+                seeker.BeginSearch();
+        }
+    }
 
     public void TerminarRonda()
     {
@@ -66,7 +137,7 @@ public class GameManager : MonoBehaviour
             return;
 
         rondaEnCurso = false;
-        Debug.Log("Ronda " + rondaActual + " terminada.");
+        Debug.Log($"Ronda {rondaActual} terminada.");
 
         rondaActual++;
         StartCoroutine(SiguienteRonda());
@@ -83,70 +154,60 @@ public class GameManager : MonoBehaviour
         // Jugador
         if (player != null)
         {
-            var playerSit = player.GetComponent<PlayerSitControl>();
-            if (playerSit != null)
-                playerSit.StandUp();
-
-            var rb = player.GetComponent<Rigidbody>();
-            if (rb != null)
-                rb.constraints = RigidbodyConstraints.None;
+            var sit = player.GetComponent<PlayerSitControl>();
+            if (sit != null)
+                sit.StandUp();
         }
 
         // NPCs
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
-
-            var npcSit = npc.GetComponent<NPCSitControl>();
-            if (npcSit != null)
-                npcSit.StandUp();
-
-            var agent = npc.GetComponent<NavMeshAgent>();
-            if (agent != null)
-            {
-                agent.enabled = true;
-                agent.isStopped = false;
-            }
-
-            var rb = npc.GetComponent<Rigidbody>();
-            if (rb != null)
-                rb.constraints = RigidbodyConstraints.None;
+            var sit = npc.GetComponent<NPCSitControl>();
+            if (sit != null)
+                sit.StandUp();
         }
     }
 
     private void ReiniciarPosiciones()
     {
+        // Jugador
         if (player != null && playerSpawn != null)
         {
             player.position = playerSpawn.position;
             player.rotation = playerSpawn.rotation;
-
-            var rb = player.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.velocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
         }
 
+        // NPCs
         for (int i = 0; i < npcs.Count; i++)
         {
-            if (npcs[i] != null && i < npcSpawns.Count && npcSpawns[i] != null)
+            if (i < npcSpawns.Count && npcSpawns[i] != null && npcs[i] != null)
             {
                 npcs[i].position = npcSpawns[i].position;
                 npcs[i].rotation = npcSpawns[i].rotation;
-
-                var rb = npcs[i].GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.velocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-                }
-
-                var seeker = npcs[i].GetComponent<NPCChairSeeker>();
-                if (seeker != null)
-                    seeker.ResetChairSearch();
             }
+        }
+    }
+
+    private void GirarPersonajesAlCentro()
+    {
+        Vector3 centro = chairsScript.transform.position;
+
+        if (player != null)
+        {
+            Vector3 dir = (centro - player.position);
+            dir.y = 0;
+            if (dir.sqrMagnitude > 0.01f)
+                player.rotation = Quaternion.LookRotation(dir);
+        }
+
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+            Vector3 dir = (centro - npc.position);
+            dir.y = 0;
+            if (dir.sqrMagnitude > 0.01f)
+                npc.rotation = Quaternion.LookRotation(dir);
         }
     }
 }
