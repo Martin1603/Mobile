@@ -12,18 +12,16 @@ public class GameManager : MonoBehaviour
     public List<Transform> npcs;
     public Transform playerSpawn;
     public List<Transform> npcSpawns;
-    public AudioSource musicaRonda; // Musica que suena mientras giran
+    public AudioSource musicaRonda; // musica durante la rotacion
 
-    [Header("Configuracion de Rondas")]
+    [Header("Configuración de Rondas")]
     public int totalRondas = 8;
     public float radioInicial = 5f;
     public int sillasIniciales = 8;
     public float incrementoRadio = 2f;
     public float tiempoEntreRondas = 3f;
-
-    [Header("Configuracion de Espera")]
-    public float tiempoEsperaPrimeraRonda = 7f;
-    public float tiempoEsperaOtrasRondas = 4f;
+    public float tiempoInicioPrimeraRonda = 7f; // solo primera ronda
+    public float tiempoInicioRondasPosteriores = 4f; // rondas siguientes
 
     private int rondaActual = 1;
     private bool rondaEnCurso = false;
@@ -48,6 +46,7 @@ public class GameManager : MonoBehaviour
         }
 
         rondaEnCurso = true;
+
         LevantarTodos();
 
         chairsScript.EliminarSillas();
@@ -58,32 +57,29 @@ public class GameManager : MonoBehaviour
         ReiniciarPosiciones();
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
+        {
             enemy.ResetForNewRound();
+        }
 
         GirarPersonajesAlCentro();
 
-        StartCoroutine(EsperarAntesDeGirar());
+        // Determinar tiempo de espera según la ronda
+        float tiempoEspera = rondaActual == 1 ? tiempoInicioPrimeraRonda : tiempoInicioRondasPosteriores;
+        StartCoroutine(EsperarAntesDeGirar(tiempoEspera));
     }
 
-    private IEnumerator EsperarAntesDeGirar()
+    private IEnumerator EsperarAntesDeGirar(float tiempoEspera)
     {
-        // Desactivar movimiento antes del giro
-        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
-        if (playerMovement != null)
-            playerMovement.enabled = false;
+        // Durante este tiempo la música suena (inicio de ronda)
+        if (musicaRonda != null && !musicaRonda.isPlaying)
+            musicaRonda.Play();
 
-        foreach (Transform npc in npcs)
-        {
-            if (npc == null) continue;
-            var agent = npc.GetComponent<NavMeshAgent>();
-            if (agent != null)
-                agent.enabled = false;
-        }
+        // Desactivar movimiento mientras esperan
+        DesactivarMovimientoPersonajes();
 
-        // Esperar segun la ronda
-        float espera = (rondaActual == 1) ? tiempoEsperaPrimeraRonda : tiempoEsperaOtrasRondas;
-        yield return new WaitForSeconds(espera);
+        yield return new WaitForSeconds(tiempoEspera);
 
+        // Empieza a girar
         StartCoroutine(RotarAntesDeLiberar());
     }
 
@@ -94,15 +90,27 @@ public class GameManager : MonoBehaviour
         float tiempoTranscurrido = 0f;
         float velocidadRotacion = 15f;
 
-        // Reproducir musica mientras giran
-        if (musicaRonda != null)
+        // Música ya debería estar sonando al comenzar a girar
+        if (musicaRonda != null && !musicaRonda.isPlaying)
+            musicaRonda.Play();
+
+        List<NavMeshAgent> agentes = new List<NavMeshAgent>();
+
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+            playerMovement.enabled = false;
+
+        foreach (Transform npc in npcs)
         {
-            musicaRonda.volume = 1f;
-            if (!musicaRonda.isPlaying)
-                musicaRonda.Play();
+            if (npc == null) continue;
+            var agent = npc.GetComponent<NavMeshAgent>();
+            if (agent != null)
+            {
+                agentes.Add(agent);
+                agent.enabled = false;
+            }
         }
 
-        // Rotar alrededor del centro
         while (tiempoTranscurrido < tiempoRotacion)
         {
             float step = velocidadRotacion * Time.deltaTime;
@@ -120,24 +128,21 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // Detener la musica al terminar el giro
-        if (musicaRonda != null)
+        // Detener música cuando terminan de girar
+        if (musicaRonda != null && musicaRonda.isPlaying)
             musicaRonda.Stop();
 
-        // Reactivar movimiento y agentes
-        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        // Reactivar movimiento
         if (playerMovement != null)
             playerMovement.enabled = true;
 
-        foreach (Transform npc in npcs)
+        foreach (var a in agentes)
         {
-            if (npc == null) continue;
-            var agent = npc.GetComponent<NavMeshAgent>();
-            if (agent != null)
-                agent.enabled = true;
+            if (a != null)
+                a.enabled = true;
         }
 
-        // Empezar la busqueda de sillas
+        // Ahora sí comienzan a buscar sillas
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
@@ -153,7 +158,7 @@ public class GameManager : MonoBehaviour
             return;
 
         rondaEnCurso = false;
-        Debug.Log("Ronda " + rondaActual + " terminada.");
+        Debug.Log($"Ronda {rondaActual} terminada.");
 
         rondaActual++;
         StartCoroutine(SiguienteRonda());
@@ -220,6 +225,23 @@ public class GameManager : MonoBehaviour
             dir.y = 0;
             if (dir.sqrMagnitude > 0.01f)
                 npc.rotation = Quaternion.LookRotation(dir);
+        }
+    }
+
+    private void DesactivarMovimientoPersonajes()
+    {
+        // Jugador
+        PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
+        if (playerMovement != null)
+            playerMovement.enabled = false;
+
+        // NPCs
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+            var agent = npc.GetComponent<NavMeshAgent>();
+            if (agent != null)
+                agent.enabled = false;
         }
     }
 }
