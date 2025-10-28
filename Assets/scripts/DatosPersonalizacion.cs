@@ -11,7 +11,6 @@ public class DatosPersonalizacion : MonoBehaviour
 
     void Awake()
     {
-        // Evitar duplicados entre escenas
         if (instancia != null && instancia != this)
         {
             Destroy(gameObject);
@@ -21,7 +20,6 @@ public class DatosPersonalizacion : MonoBehaviour
         instancia = this;
         DontDestroyOnLoad(gameObject);
 
-        // Escuchar cuando cambia de escena
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -32,7 +30,6 @@ public class DatosPersonalizacion : MonoBehaviour
 
     private void OnSceneLoaded(Scene escena, LoadSceneMode modo)
     {
-        // Buscar los gestores si no fueron asignados manualmente
         if (gestorAccesorios == null)
             gestorAccesorios = FindObjectOfType<accesorios>();
 
@@ -42,9 +39,8 @@ public class DatosPersonalizacion : MonoBehaviour
         CargarDatos();
     }
 
-    // ----------------------------------------------------------------------
     // GUARDAR DATOS
-    // ----------------------------------------------------------------------
+
     public void GuardarDatos()
     {
         if (gestorAccesorios != null)
@@ -66,9 +62,9 @@ public class DatosPersonalizacion : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    // ----------------------------------------------------------------------
+
     // CARGAR DATOS
-    // ----------------------------------------------------------------------
+
     public void CargarDatos()
     {
         if (gestorAccesorios != null)
@@ -97,9 +93,8 @@ public class DatosPersonalizacion : MonoBehaviour
         }
     }
 
-    // ----------------------------------------------------------------------
     // FUNCIONES AUXILIARES
-    // ----------------------------------------------------------------------
+   
     int ObtenerIndiceMaterialActual(GrupoDeMateriales grupo)
     {
         if (grupo.objetos.Length == 0 || grupo.materiales.Length == 0) return 0;
