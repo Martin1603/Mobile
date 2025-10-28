@@ -17,10 +17,10 @@ public class Chairs : MonoBehaviour
         {
             // Calcula una posición en círculo
             Vector3 p = new Vector3(
-                Mathf.Sin(i * 2 * Mathf.PI / nSillas),
-                -0.1f,
-                Mathf.Cos(i * 2 * Mathf.PI / nSillas)
-            ) * radio;
+                Mathf.Sin(i * 2 * Mathf.PI / nSillas) * radio,
+                -0.25f,
+                Mathf.Cos(i * 2 * Mathf.PI / nSillas) * radio
+            );
 
             // Instancia la silla
             GameObject s = Instantiate(prefabSillas, p, Quaternion.identity);
@@ -56,6 +56,10 @@ public class Chairs : MonoBehaviour
     private void Awake()
     {
         CrearSillas();
+    }
+    public List<GameObject> GetSillas()
+    {
+        return sillas;
     }
 }
 

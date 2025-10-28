@@ -6,7 +6,8 @@ public class PlayerSitControl : MonoBehaviour
 {
     private PlayerMovement playerMovement;
     private Rigidbody rb;
-    private bool isSitting = false;
+    public bool isSitting = false;
+    public Animator animator;
 
     void Start()
     {
@@ -34,6 +35,8 @@ public class PlayerSitControl : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
+
+        animator.SetBool("sentado", true);
     }
 
     public void StandUp()
@@ -44,10 +47,20 @@ public class PlayerSitControl : MonoBehaviour
 
         if (rb != null)
             rb.constraints = RigidbodyConstraints.None;
+
+        animator.SetBool("sentado", false);
+
     }
 
     public bool IsSitting()
     {
         return isSitting;
+    }
+
+    public void Morir()
+    {
+        Debug.LogWarning($"MORIR() llamado desde: {new System.Diagnostics.StackTrace()}");
+        // Aquí puedes poner una animación de muerte o simplemente desactivar el objeto
+        gameObject.SetActive(false);
     }
 }

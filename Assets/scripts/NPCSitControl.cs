@@ -5,7 +5,8 @@ using UnityEngine;
 public class NPCSitControl : MonoBehaviour
 {
     private Rigidbody rb;
-    private bool isSitting = false;
+    public bool isSitting = false;
+    public Animator animator;
 
     void Start()
     {
@@ -14,13 +15,14 @@ public class NPCSitControl : MonoBehaviour
 
     public void SitDown(Vector3 seatPosition)
     {
-        if (isSitting) return;
+        // Si ya estaba sentado o el objeto no esta activo, salir
+        if (isSitting || !gameObject.activeInHierarchy) return;
+
         isSitting = true;
 
         transform.position = seatPosition;
         transform.rotation = Quaternion.identity;
 
-        var rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
             rb.velocity = Vector3.zero;
@@ -34,20 +36,41 @@ public class NPCSitControl : MonoBehaviour
             agent.isStopped = true;
             agent.enabled = false;
         }
+
+        animator.SetBool("sentado", true);
     }
 
-        public void StandUp()
+    public void StandUp()
     {
-        if (!isSitting) return;
-
+        // Forzar liberacion sin return prematuro
         isSitting = false;
 
         if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.None;
+        }
+
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            // Asegurarse de activar el agente y despausar
+            agent.enabled = true;
+            agent.isStopped = false;
+        }
+
+        animator.SetBool("sentado", false);
     }
 
     public bool IsSitting()
     {
         return isSitting;
+    }
+
+    public void Morir()
+    {
+        // Desactivar el objeto (comportamiento actual)
+        gameObject.SetActive(false);
     }
 }
