@@ -14,5 +14,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Personalizar.unity
     guid: 808ffafcbd288b740a4b62308accc0ea
+  - enabled: 1
+    path: Assets/Scenes/perder.unity
+    guid: 631ede851ec5f33418e8e0c1f8c1a055
+  - enabled: 1
+    path: Assets/Scenes/ganar.unity
+    guid: 27387c09fa6dab94fa73ec734b0e645a
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
