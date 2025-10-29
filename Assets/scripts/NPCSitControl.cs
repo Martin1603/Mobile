@@ -15,7 +15,6 @@ public class NPCSitControl : MonoBehaviour
 
     public void SitDown(Vector3 seatPosition)
     {
-        // Si ya estaba sentado o el objeto no esta activo, salir
         if (isSitting || !gameObject.activeInHierarchy) return;
 
         isSitting = true;
@@ -42,7 +41,6 @@ public class NPCSitControl : MonoBehaviour
 
     public void StandUp()
     {
-        // Forzar liberacion sin return prematuro
         isSitting = false;
 
         if (rb != null)
@@ -55,7 +53,6 @@ public class NPCSitControl : MonoBehaviour
         var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent != null)
         {
-            // Asegurarse de activar el agente y despausar
             agent.enabled = true;
             agent.isStopped = false;
         }
@@ -70,7 +67,40 @@ public class NPCSitControl : MonoBehaviour
 
     public void Morir()
     {
-        // Desactivar el objeto (comportamiento actual)
+        // Inicia la animación de muerte si existe
+        if (animator != null)
+        {
+            animator.SetTrigger("morir");
+        }
+
+        // Inicia una corrutina para esperar que termine la animación antes de desactivar el objeto
+        StartCoroutine(DesactivarDespuesDeMorir());
+    }
+
+    private IEnumerator DesactivarDespuesDeMorir()
+    {
+        if (animator != null)
+        {
+            // Esperar hasta que la animación de muerte realmente empiece
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            while (!stateInfo.IsName("morir")) // ?? cambia "morir" por el nombre exacto de tu animación
+            {
+                yield return null; // esperar un frame
+                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            }
+
+            // Ahora sí estamos en la animación de muerte
+            float duracion = stateInfo.length;
+
+            // Esperar el tiempo real más un pequeño margen de seguridad
+            yield return new WaitForSeconds(duracion + 0.2f);
+        }
+        else
+        {
+            // Si no hay animator, usar tiempo fijo
+            yield return new WaitForSeconds(3f);
+        }
+
         gameObject.SetActive(false);
     }
 }

@@ -7,6 +7,9 @@ public class Enemy : MonoBehaviour
     public float tiempoAntesDeMatar = 2f;
     public float tiempoAntesDeReiniciar = 3f;
 
+    [Header("Referencias")]
+    public Animator animator; // <-- Nuevo: referencia al Animator del enemigo
+
     private GameManager gameManager;
     private Chairs chairsScript;
     private bool rondaEnProgreso = false;
@@ -16,6 +19,10 @@ public class Enemy : MonoBehaviour
     {
         gameManager = FindObjectOfType<GameManager>();
         chairsScript = FindObjectOfType<Chairs>();
+
+        // Buscar el Animator automáticamente si no se asigna
+        if (animator == null)
+            animator = GetComponent<Animator>();
     }
 
     void Update()
@@ -45,6 +52,13 @@ public class Enemy : MonoBehaviour
     {
         rondaEnProgreso = true;
 
+        // ?? Reproducir animación antes de matar
+        if (animator != null)
+        {
+            animator.SetTrigger("matar");
+        }
+
+        // Espera antes de matar (permite que se vea la animación)
         yield return new WaitForSeconds(tiempoAntesDeMatar);
 
         NPCSitControl[] npcs = FindObjectsOfType<NPCSitControl>();
@@ -90,11 +104,9 @@ public class Enemy : MonoBehaviour
                 seeker.ResetChairSearch();
         }
 
-        // permitir nueva detección en la próxima ronda (GameManager debe llamar ResetEnemyRound)
         rondaEnProgreso = false;
     }
 
-    // Llamar desde GameManager cuando comience una nueva ronda para permitir que el Enemy vuelva a detectar
     public void ResetForNewRound()
     {
         yaEjecutadoEstaRonda = false;

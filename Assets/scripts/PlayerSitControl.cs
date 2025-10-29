@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerSitControl : MonoBehaviour
@@ -11,6 +10,7 @@ public class PlayerSitControl : MonoBehaviour
     public bool isSitting = false;          // estado real
     private bool forcedSitting = false;     // estado forzado temporal
 
+    [Header("Animaciones")]
     public Animator animator;
 
     void Start()
@@ -22,7 +22,7 @@ public class PlayerSitControl : MonoBehaviour
     void Update()
     {
         if (playerMovement != null)
-            playerMovement.enabled = !IsSitting(); // ahora usa IsSitting() (real o forzado)
+            playerMovement.enabled = !IsSitting(); // desactiva movimiento si está sentado o forzado
     }
 
     public void SitDown(Vector3 seatPosition)
@@ -55,7 +55,6 @@ public class PlayerSitControl : MonoBehaviour
 
         if (animator != null)
             animator.SetBool("sentado", forcedSitting ? true : false);
-        // mantiene el bool activo si aún está forzado
     }
 
     public bool IsSitting()
@@ -68,14 +67,47 @@ public class PlayerSitControl : MonoBehaviour
     {
         forcedSitting = value;
 
-        // Refleja visualmente el estado forzado
         if (animator != null)
             animator.SetBool("sentado", value || isSitting);
     }
 
     public void Morir()
     {
-        Debug.LogWarning($"MORIR() llamado desde: {new System.Diagnostics.StackTrace()}");
+        // Si tiene animador, ejecutar animación de muerte antes de desaparecer
+        if (animator != null)
+        {
+            animator.SetTrigger("morir"); // asegúrate de tener este trigger en tu Animator
+            StartCoroutine(DesactivarDespuesDeMorir());
+        }
+        else
+        {
+            // Si no hay animador, desaparecer inmediatamente
+            gameObject.SetActive(false);
+        }
+    }
+
+    private IEnumerator DesactivarDespuesDeMorir()
+    {
+        if (animator != null)
+        {
+            // Esperar hasta que la animación de muerte realmente empiece
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            while (!stateInfo.IsName("morir")) // cambia "morir" por el nombre exacto del clip
+            {
+                yield return null;
+                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            }
+
+            // Esperar toda la duración de la animación
+            float duracion = stateInfo.length;
+            yield return new WaitForSeconds(duracion + 0.2f);
+        }
+        else
+        {
+            // Tiempo fijo si no hay animador
+            yield return new WaitForSeconds(3f);
+        }
+
         gameObject.SetActive(false);
     }
 }

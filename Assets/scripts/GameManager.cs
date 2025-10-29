@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement; // ? Necesario para cambiar escenas
 
 public class GameManager : MonoBehaviour
 {
@@ -12,7 +13,9 @@ public class GameManager : MonoBehaviour
     public List<Transform> npcs;
     public Transform playerSpawn;
     public List<Transform> npcSpawns;
-    public AudioSource musicaRonda; // musica durante la rotacion
+    public AudioSource musicaRonda; // música durante la rotación
+    public Animator baflesAnimator;  // Bafle 1
+    public Animator baflesAnimator2; // Bafle 2
 
     [Header("Configuración de Rondas")]
     public int totalRondas = 8;
@@ -25,10 +28,21 @@ public class GameManager : MonoBehaviour
 
     private int rondaActual = 1;
     private bool rondaEnCurso = false;
+    private bool juegoTerminado = false; // ? Evita que se llame la escena más de una vez
 
     private void Start()
     {
         StartCoroutine(EsperarYComenzarPrimeraRonda());
+    }
+
+    private void Update()
+    {
+        // ? Si el jugador se desactiva (muere), ir a la escena "perder"
+        if (!juegoTerminado && (player == null || !player.gameObject.activeInHierarchy))
+        {
+            juegoTerminado = true;
+            SceneManager.LoadScene("perder");
+        }
     }
 
     private IEnumerator EsperarYComenzarPrimeraRonda()
@@ -41,7 +55,12 @@ public class GameManager : MonoBehaviour
     {
         if (rondaActual > totalRondas)
         {
-            Debug.Log("Juego terminado. Todas las rondas completadas.");
+            // ? Si completó todas las rondas, gana
+            if (!juegoTerminado)
+            {
+                juegoTerminado = true;
+                SceneManager.LoadScene("ganar");
+            }
             return;
         }
 
@@ -63,28 +82,30 @@ public class GameManager : MonoBehaviour
 
         GirarPersonajesAlCentro();
 
-        // Determinar tiempo de espera según la ronda
         float tiempoEspera = rondaActual == 1 ? tiempoInicioPrimeraRonda : tiempoInicioRondasPosteriores;
         StartCoroutine(EsperarAntesDeGirar(tiempoEspera));
     }
 
     private IEnumerator EsperarAntesDeGirar(float tiempoEspera)
     {
-        // ?? Bloquea movimiento del jugador mientras espera y gira
         var sitControl = player.GetComponent<PlayerSitControl>();
         if (sitControl != null)
             sitControl.SetForcedSitting(true);
 
-        // Activa la música si no está sonando
+        // ?? Encender música y animaciones de ambos bafles
         if (musicaRonda != null && !musicaRonda.isPlaying)
+        {
             musicaRonda.Play();
+            if (baflesAnimator != null)
+                baflesAnimator.SetBool("Encendidos", true);
+            if (baflesAnimator2 != null)
+                baflesAnimator2.SetBool("Encendidos", true);
+        }
 
-        // Desactiva movimiento de NPCs también
         DesactivarMovimientoPersonajes();
 
         yield return new WaitForSeconds(tiempoEspera);
 
-        // Empieza la rotación
         StartCoroutine(RotarAntesDeLiberar(sitControl));
     }
 
@@ -96,7 +117,13 @@ public class GameManager : MonoBehaviour
         float velocidadRotacion = 15f;
 
         if (musicaRonda != null && !musicaRonda.isPlaying)
+        {
             musicaRonda.Play();
+            if (baflesAnimator != null)
+                baflesAnimator.SetBool("Encendidos", true);
+            if (baflesAnimator2 != null)
+                baflesAnimator2.SetBool("Encendidos", true);
+        }
 
         List<NavMeshAgent> agentes = new List<NavMeshAgent>();
 
@@ -132,11 +159,16 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // ?? Detener música cuando termina de girar
+        // ?? Apagar música y ambos bafles al detenerse
         if (musicaRonda != null && musicaRonda.isPlaying)
+        {
             musicaRonda.Stop();
+            if (baflesAnimator != null)
+                baflesAnimator.SetBool("Encendidos", false);
+            if (baflesAnimator2 != null)
+                baflesAnimator2.SetBool("Encendidos", false);
+        }
 
-        // ? Reactivar movimiento
         if (playerMovement != null)
             playerMovement.enabled = true;
 
@@ -146,11 +178,9 @@ public class GameManager : MonoBehaviour
                 a.enabled = true;
         }
 
-        // ?? Desbloquear al jugador después de girar
         if (sitControl != null)
             sitControl.SetForcedSitting(false);
 
-        // NPCs empiezan a buscar sillas
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
