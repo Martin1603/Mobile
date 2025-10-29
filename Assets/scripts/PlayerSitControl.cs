@@ -6,7 +6,11 @@ public class PlayerSitControl : MonoBehaviour
 {
     private PlayerMovement playerMovement;
     private Rigidbody rb;
-    public bool isSitting = false;
+
+    [Header("Estados")]
+    public bool isSitting = false;          // estado real
+    private bool forcedSitting = false;     // estado forzado temporal
+
     public Animator animator;
 
     void Start()
@@ -18,7 +22,7 @@ public class PlayerSitControl : MonoBehaviour
     void Update()
     {
         if (playerMovement != null)
-            playerMovement.enabled = !isSitting;
+            playerMovement.enabled = !IsSitting(); // ahora usa IsSitting() (real o forzado)
     }
 
     public void SitDown(Vector3 seatPosition)
@@ -36,7 +40,8 @@ public class PlayerSitControl : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
-        animator.SetBool("sentado", true);
+        if (animator != null)
+            animator.SetBool("sentado", true);
     }
 
     public void StandUp()
@@ -48,19 +53,29 @@ public class PlayerSitControl : MonoBehaviour
         if (rb != null)
             rb.constraints = RigidbodyConstraints.None;
 
-        animator.SetBool("sentado", false);
-
+        if (animator != null)
+            animator.SetBool("sentado", forcedSitting ? true : false);
+        // mantiene el bool activo si aún está forzado
     }
 
     public bool IsSitting()
     {
-        return isSitting;
+        // Devuelve true si está sentado realmente o si se forzó el estado
+        return isSitting || forcedSitting;
+    }
+
+    public void SetForcedSitting(bool value)
+    {
+        forcedSitting = value;
+
+        // Refleja visualmente el estado forzado
+        if (animator != null)
+            animator.SetBool("sentado", value || isSitting);
     }
 
     public void Morir()
     {
         Debug.LogWarning($"MORIR() llamado desde: {new System.Diagnostics.StackTrace()}");
-        // Aquí puedes poner una animación de muerte o simplemente desactivar el objeto
         gameObject.SetActive(false);
     }
 }

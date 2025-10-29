@@ -70,27 +70,31 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator EsperarAntesDeGirar(float tiempoEspera)
     {
-        // Durante este tiempo la música suena (inicio de ronda)
+        // ?? Bloquea movimiento del jugador mientras espera y gira
+        var sitControl = player.GetComponent<PlayerSitControl>();
+        if (sitControl != null)
+            sitControl.SetForcedSitting(true);
+
+        // Activa la música si no está sonando
         if (musicaRonda != null && !musicaRonda.isPlaying)
             musicaRonda.Play();
 
-        // Desactivar movimiento mientras esperan
+        // Desactiva movimiento de NPCs también
         DesactivarMovimientoPersonajes();
 
         yield return new WaitForSeconds(tiempoEspera);
 
-        // Empieza a girar
-        StartCoroutine(RotarAntesDeLiberar());
+        // Empieza la rotación
+        StartCoroutine(RotarAntesDeLiberar(sitControl));
     }
 
-    private IEnumerator RotarAntesDeLiberar()
+    private IEnumerator RotarAntesDeLiberar(PlayerSitControl sitControl)
     {
         Vector3 centro = chairsScript.transform.position;
         float tiempoRotacion = Random.Range(2f, 5f);
         float tiempoTranscurrido = 0f;
         float velocidadRotacion = 15f;
 
-        // Música ya debería estar sonando al comenzar a girar
         if (musicaRonda != null && !musicaRonda.isPlaying)
             musicaRonda.Play();
 
@@ -128,11 +132,11 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // Detener música cuando terminan de girar
+        // ?? Detener música cuando termina de girar
         if (musicaRonda != null && musicaRonda.isPlaying)
             musicaRonda.Stop();
 
-        // Reactivar movimiento
+        // ? Reactivar movimiento
         if (playerMovement != null)
             playerMovement.enabled = true;
 
@@ -142,7 +146,11 @@ public class GameManager : MonoBehaviour
                 a.enabled = true;
         }
 
-        // Ahora sí comienzan a buscar sillas
+        // ?? Desbloquear al jugador después de girar
+        if (sitControl != null)
+            sitControl.SetForcedSitting(false);
+
+        // NPCs empiezan a buscar sillas
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
@@ -230,12 +238,10 @@ public class GameManager : MonoBehaviour
 
     private void DesactivarMovimientoPersonajes()
     {
-        // Jugador
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         if (playerMovement != null)
             playerMovement.enabled = false;
 
-        // NPCs
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
