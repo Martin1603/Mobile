@@ -139,27 +139,43 @@ public class GameManager : MonoBehaviour
     private IEnumerator RotarAntesDeLiberar(PlayerSitControl sitControl)
     {
         Vector3 centro = chairsScript.transform.position;
-        float tiempoRotacion = Random.Range(2f, 5f);
+        float tiempoRotacion = Random.Range(2f, 10f);
         float tiempoTranscurrido = 0f;
         float velocidadRotacion = 15f;
 
         List<NavMeshAgent> agentes = new List<NavMeshAgent>();
+        List<Rigidbody> rigidbodies = new List<Rigidbody>();
 
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         if (playerMovement != null)
             playerMovement.enabled = false;
 
+        // Desactivar los NavMeshAgents y congelar rotaciones
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
+
             var agent = npc.GetComponent<NavMeshAgent>();
             if (agent != null)
             {
                 agentes.Add(agent);
                 agent.enabled = false;
             }
+
+            var rb = npc.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rigidbodies.Add(rb);
+                rb.constraints = RigidbodyConstraints.FreezeRotation; // ? congela la rotación
+            }
         }
 
+        // Congelar rotación del jugador si tiene Rigidbody
+        var playerRb = player.GetComponent<Rigidbody>();
+        if (playerRb != null)
+            playerRb.constraints = RigidbodyConstraints.FreezeRotation;
+
+        // --- Inicio del giro ---
         while (tiempoTranscurrido < tiempoRotacion)
         {
             float step = velocidadRotacion * Time.deltaTime;
@@ -176,7 +192,9 @@ public class GameManager : MonoBehaviour
             tiempoTranscurrido += Time.deltaTime;
             yield return null;
         }
+        // --- Fin del giro ---
 
+        // Apagar música y luces
         if (musicaRonda != null && musicaRonda.isPlaying)
         {
             musicaRonda.Stop();
@@ -186,6 +204,7 @@ public class GameManager : MonoBehaviour
                 baflesAnimator2.SetBool("Encendidos", false);
         }
 
+        // Reactivar movimiento
         if (playerMovement != null)
             playerMovement.enabled = true;
 
@@ -195,9 +214,20 @@ public class GameManager : MonoBehaviour
                 a.enabled = true;
         }
 
+        // Restaurar constraints de Rigidbody
+        foreach (var rb in rigidbodies)
+        {
+            if (rb != null)
+                rb.constraints = RigidbodyConstraints.None; // ? libera nuevamente
+        }
+
+        if (playerRb != null)
+            playerRb.constraints = RigidbodyConstraints.None;
+
         if (sitControl != null)
             sitControl.SetForcedSitting(false);
 
+        // Iniciar búsqueda de sillas
         foreach (Transform npc in npcs)
         {
             if (npc == null) continue;
