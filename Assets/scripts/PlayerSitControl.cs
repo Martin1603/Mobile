@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement; // necesario para cambiar de escena
 
 public class PlayerSitControl : MonoBehaviour
 {
@@ -12,6 +13,13 @@ public class PlayerSitControl : MonoBehaviour
 
     [Header("Animaciones")]
     public Animator animator;
+
+    [Header("Sonido de Muerte")]
+    public AudioSource audioSource;
+    public AudioClip sonidoMuerte;
+
+    [Header("Referencia GameManager")]
+    public GameManager gameManager; // asigna desde el Inspector
 
     void Start()
     {
@@ -59,7 +67,6 @@ public class PlayerSitControl : MonoBehaviour
 
     public bool IsSitting()
     {
-        // Devuelve true si está sentado realmente o si se forzó el estado
         return isSitting || forcedSitting;
     }
 
@@ -73,41 +80,43 @@ public class PlayerSitControl : MonoBehaviour
 
     public void Morir()
     {
-        // Si tiene animador, ejecutar animación de muerte antes de desaparecer
+        // ?? Reproducir sonido de muerte
+        if (audioSource != null && sonidoMuerte != null)
+        {
+            audioSource.PlayOneShot(sonidoMuerte);
+        }
+
+        // Ejecutar animación de muerte
         if (animator != null)
         {
-            animator.SetTrigger("morir"); // asegúrate de tener este trigger en tu Animator
-            StartCoroutine(DesactivarDespuesDeMorir());
+            animator.SetTrigger("morir");
+            StartCoroutine(AlTerminarMuerte());
         }
         else
         {
-            // Si no hay animador, desaparecer inmediatamente
-            gameObject.SetActive(false);
+            // Si no hay animador, ir directo a perder
+            IrEscenaPerder();
         }
     }
 
-    private IEnumerator DesactivarDespuesDeMorir()
+    private IEnumerator AlTerminarMuerte()
     {
-        if (animator != null)
+        // Esperar a que la animación de morir termine
+        AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+        while (!stateInfo.IsName("morir"))
         {
-            // Esperar hasta que la animación de muerte realmente empiece
-            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            while (!stateInfo.IsName("morir")) // cambia "morir" por el nombre exacto del clip
-            {
-                yield return null;
-                stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            }
-
-            // Esperar toda la duración de la animación
-            float duracion = stateInfo.length;
-            yield return new WaitForSeconds(duracion + 0.2f);
-        }
-        else
-        {
-            // Tiempo fijo si no hay animador
-            yield return new WaitForSeconds(3f);
+            yield return null;
+            stateInfo = animator.GetCurrentAnimatorStateInfo(0);
         }
 
-        gameObject.SetActive(false);
+        float duracion = stateInfo.length;
+        yield return new WaitForSeconds(duracion + 0.2f);
+
+        IrEscenaPerder();
+    }
+
+    private void IrEscenaPerder()
+    {
+        SceneManager.LoadScene("perder");
     }
 }

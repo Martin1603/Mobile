@@ -1,24 +1,34 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class NPCSitControl : MonoBehaviour
 {
     private Rigidbody rb;
+    private NavMeshAgent agent;
+    private Collider col;
+
+    [Header("Estados")]
     public bool isSitting = false;
+    [HideInInspector] public bool isDead = false;
+
+    [Header("Referencias")]
     public Animator animator;
+    public AudioSource audioSource;
+    public AudioClip sonidoMuerte;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        agent = GetComponent<NavMeshAgent>();
+        col = GetComponent<Collider>();
     }
 
     public void SitDown(Vector3 seatPosition)
     {
-        if (isSitting || !gameObject.activeInHierarchy) return;
+        if (isSitting || isDead || !gameObject.activeInHierarchy) return;
 
         isSitting = true;
-
         transform.position = seatPosition;
         transform.rotation = Quaternion.identity;
 
@@ -29,78 +39,121 @@ public class NPCSitControl : MonoBehaviour
             rb.constraints = RigidbodyConstraints.FreezeAll;
         }
 
-        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent != null)
         {
             agent.isStopped = true;
             agent.enabled = false;
         }
 
-        animator.SetBool("sentado", true);
+        if (animator != null)
+            animator.SetBool("sentado", true);
     }
 
     public void StandUp()
     {
+        if (isDead) return;
+
         isSitting = false;
 
         if (rb != null)
-        {
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
             rb.constraints = RigidbodyConstraints.None;
-        }
 
-        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
         if (agent != null)
         {
             agent.enabled = true;
             agent.isStopped = false;
         }
 
-        animator.SetBool("sentado", false);
+        if (animator != null)
+            animator.SetBool("sentado", false);
     }
 
-    public bool IsSitting()
-    {
-        return isSitting;
-    }
+    public bool IsSitting() => isSitting;
+    public bool EstaMuerto() => isDead;
 
     public void Morir()
     {
-        // Inicia la animación de muerte si existe
-        if (animator != null)
+        if (isDead) return;
+        isDead = true;
+
+        // ?? Sonido de muerte
+        if (audioSource != null && sonidoMuerte != null)
+            audioSource.PlayOneShot(sonidoMuerte);
+
+        // ?? Congelar movimiento
+        if (agent != null)
         {
-            animator.SetTrigger("morir");
+            agent.isStopped = true;
+            agent.enabled = false;
         }
 
-        // Inicia una corrutina para esperar que termine la animación antes de desactivar el objeto
-        StartCoroutine(DesactivarDespuesDeMorir());
+        if (rb != null)
+        {
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+            rb.constraints = RigidbodyConstraints.FreezeAll;
+        }
+
+        if (animator != null)
+            animator.SetTrigger("morir");
+
+        // ?? Desactivar colisionador para no interferir con sillas
+        if (col != null)
+            col.enabled = false;
+
+        // ??? Eliminar tag
+        gameObject.tag = "Untagged";
+
+        // ?? Buscar y eliminar cualquier componente llamado "LegsAnimator" en hijos
+        Component[] legsAnimators = GetComponentsInChildren(typeof(MonoBehaviour), true);
+        foreach (var comp in legsAnimators)
+        {
+            if (comp != null && comp.GetType().Name == "LegsAnimator")
+            {
+                Destroy(comp);
+                Debug.Log($"{name}: LegsAnimator eliminado correctamente");
+            }
+        }
+
+        // ?? Buscar y eliminar cualquier componente llamado "TailAnimator2" en hijos
+        Component[] tailAnimators = GetComponentsInChildren(typeof(MonoBehaviour), true);
+        foreach (var comp in tailAnimators)
+        {
+            if (comp != null && comp.GetType().Name == "TailAnimator2")
+            {
+                Destroy(comp);
+                Debug.Log($"{name}: TailAnimator2 eliminado correctamente");
+            }
+        }
+
+        // ?? Avisar al GameManager
+        GameManager gm = FindObjectOfType<GameManager>();
+        if (gm != null)
+            gm.ExcluirNPCMuerto(transform);
+
+        StartCoroutine(EsperarAnimacionMuerte());
     }
 
-    private IEnumerator DesactivarDespuesDeMorir()
+    private IEnumerator EsperarAnimacionMuerte()
     {
         if (animator != null)
         {
-            // Esperar hasta que la animación de muerte realmente empiece
             AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
-            while (!stateInfo.IsName("morir")) // ?? cambia "morir" por el nombre exacto de tu animación
+            while (!stateInfo.IsName("morir"))
             {
-                yield return null; // esperar un frame
+                yield return null;
                 stateInfo = animator.GetCurrentAnimatorStateInfo(0);
             }
 
-            // Ahora sí estamos en la animación de muerte
             float duracion = stateInfo.length;
-
-            // Esperar el tiempo real más un pequeño margen de seguridad
-            yield return new WaitForSeconds(duracion + 0.2f);
+            yield return new WaitForSeconds(duracion + 0.3f);
         }
         else
         {
-            // Si no hay animator, usar tiempo fijo
             yield return new WaitForSeconds(3f);
         }
 
-        gameObject.SetActive(false);
+        if (rb != null)
+            rb.constraints = RigidbodyConstraints.FreezeAll;
     }
 }
