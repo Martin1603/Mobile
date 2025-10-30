@@ -17,6 +17,8 @@ public class NPCSitControl : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip sonidoMuerte;
 
+    public Animator sangre;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -96,6 +98,7 @@ public class NPCSitControl : MonoBehaviour
 
         if (animator != null)
             animator.SetTrigger("morir");
+            sangre.SetTrigger("muere");
 
         // ?? Desactivar colisionador para no interferir con sillas
         if (col != null)
