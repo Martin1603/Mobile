@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement; // ? Necesario para cambiar escenas
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,9 +13,9 @@ public class GameManager : MonoBehaviour
     public List<Transform> npcs;
     public Transform playerSpawn;
     public List<Transform> npcSpawns;
-    public AudioSource musicaRonda; // música durante la rotación
-    public Animator baflesAnimator;  // Bafle 1
-    public Animator baflesAnimator2; // Bafle 2
+    public AudioSource musicaRonda;
+    public Animator baflesAnimator;
+    public Animator baflesAnimator2;
 
     [Header("Configuración de Rondas")]
     public int totalRondas = 8;
@@ -23,12 +23,40 @@ public class GameManager : MonoBehaviour
     public int sillasIniciales = 8;
     public float incrementoRadio = 2f;
     public float tiempoEntreRondas = 3f;
-    public float tiempoInicioPrimeraRonda = 7f; // solo primera ronda
-    public float tiempoInicioRondasPosteriores = 4f; // rondas siguientes
+    public float tiempoInicioPrimeraRonda = 7f;
+    public float tiempoInicioRondasPosteriores = 4f;
+
+    [HideInInspector]
+    public Dictionary<Transform, float> alturasIniciales = new Dictionary<Transform, float>();
 
     private int rondaActual = 1;
     private bool rondaEnCurso = false;
-    private bool juegoTerminado = false; // ? Evita que se llame la escena más de una vez
+    private bool juegoTerminado = false;
+
+    private Dictionary<Transform, float> radiosOriginales = new Dictionary<Transform, float>();
+    private Dictionary<Transform, float> angulosOriginales = new Dictionary<Transform, float>();
+
+    public void RegistrarPosicionesIniciales()
+    {
+        Vector3 centro = chairsScript.transform.position;
+
+        // Guardar radio y ángulo de NPCs
+        foreach (Transform npc in npcs)
+        {
+            if (npc == null) continue;
+            Vector3 offset = npc.position - centro;
+            radiosOriginales[npc] = new Vector2(offset.x, offset.z).magnitude;
+            angulosOriginales[npc] = Mathf.Atan2(offset.z, offset.x);
+        }
+
+        // Guardar radio y ángulo del player
+        if (player != null)
+        {
+            Vector3 offset = player.position - centro;
+            radiosOriginales[player] = new Vector2(offset.x, offset.z).magnitude;
+            angulosOriginales[player] = Mathf.Atan2(offset.z, offset.x);
+        }
+    }
 
     private void Start()
     {
@@ -37,7 +65,6 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // ? Si el jugador se desactiva (muere), ir a la escena "perder"
         if (!juegoTerminado && (player == null || !player.gameObject.activeInHierarchy))
         {
             juegoTerminado = true;
@@ -55,7 +82,6 @@ public class GameManager : MonoBehaviour
     {
         if (rondaActual > totalRondas)
         {
-            // ? Si completó todas las rondas, gana
             if (!juegoTerminado)
             {
                 juegoTerminado = true;
@@ -68,11 +94,13 @@ public class GameManager : MonoBehaviour
 
         LevantarTodos();
 
+        // Configurar sillas (solo afecta a las sillas)
         chairsScript.EliminarSillas();
         chairsScript.nSillas = sillasIniciales - (rondaActual - 1);
-        chairsScript.radio = radioInicial + (rondaActual - 1) * incrementoRadio;
+        chairsScript.radio = radioInicial + (rondaActual - 1) * incrementoRadio; // radio dinámico solo para sillas
         chairsScript.CrearSillas();
 
+        // Reorganizar personajes usando su radio original fijo
         ReiniciarPosiciones();
 
         foreach (Enemy enemy in FindObjectsOfType<Enemy>())
@@ -92,7 +120,6 @@ public class GameManager : MonoBehaviour
         if (sitControl != null)
             sitControl.SetForcedSitting(true);
 
-        // ?? Encender música y animaciones de ambos bafles
         if (musicaRonda != null && !musicaRonda.isPlaying)
         {
             musicaRonda.Play();
@@ -115,15 +142,6 @@ public class GameManager : MonoBehaviour
         float tiempoRotacion = Random.Range(2f, 5f);
         float tiempoTranscurrido = 0f;
         float velocidadRotacion = 15f;
-
-        if (musicaRonda != null && !musicaRonda.isPlaying)
-        {
-            musicaRonda.Play();
-            if (baflesAnimator != null)
-                baflesAnimator.SetBool("Encendidos", true);
-            if (baflesAnimator2 != null)
-                baflesAnimator2.SetBool("Encendidos", true);
-        }
 
         List<NavMeshAgent> agentes = new List<NavMeshAgent>();
 
@@ -159,7 +177,6 @@ public class GameManager : MonoBehaviour
             yield return null;
         }
 
-        // ?? Apagar música y ambos bafles al detenerse
         if (musicaRonda != null && musicaRonda.isPlaying)
         {
             musicaRonda.Stop();
@@ -196,8 +213,6 @@ public class GameManager : MonoBehaviour
             return;
 
         rondaEnCurso = false;
-        Debug.Log($"Ronda {rondaActual} terminada.");
-
         rondaActual++;
         StartCoroutine(SiguienteRonda());
     }
@@ -228,19 +243,44 @@ public class GameManager : MonoBehaviour
 
     private void ReiniciarPosiciones()
     {
-        if (player != null && playerSpawn != null)
+        Vector3 centro = chairsScript.transform.position;
+
+        // Crear lista de personajes vivos (NPCs activos + player)
+        List<Transform> vivos = new List<Transform>();
+        if (player != null && player.gameObject.activeInHierarchy)
+            vivos.Add(player);
+
+        foreach (Transform npc in npcs)
         {
-            player.position = playerSpawn.position;
-            player.rotation = playerSpawn.rotation;
+            if (npc != null && npc.gameObject.activeInHierarchy)
+                vivos.Add(npc);
         }
 
-        for (int i = 0; i < npcs.Count; i++)
+        int cantidad = vivos.Count;
+        if (cantidad == 0) return;
+
+        for (int i = 0; i < cantidad; i++)
         {
-            if (i < npcSpawns.Count && npcSpawns[i] != null && npcs[i] != null)
-            {
-                npcs[i].position = npcSpawns[i].position;
-                npcs[i].rotation = npcSpawns[i].rotation;
-            }
+            Transform personaje = vivos[i];
+
+            float radio = radiosOriginales.ContainsKey(personaje) ? radiosOriginales[personaje] : radioInicial;
+            float altura = alturasIniciales.ContainsKey(personaje) ? alturasIniciales[personaje] : personaje.position.y;
+
+            // Recalcular ángulo equitativo
+            float angulo = i * Mathf.PI * 2f / cantidad;
+
+            Vector3 nuevaPos = new Vector3(
+                centro.x + radio * Mathf.Cos(angulo),
+                altura,
+                centro.z + radio * Mathf.Sin(angulo)
+            );
+
+            personaje.position = nuevaPos;
+
+            Vector3 dir = (centro - personaje.position);
+            dir.y = 0;
+            if (dir.sqrMagnitude > 0.01f)
+                personaje.rotation = Quaternion.LookRotation(dir);
         }
     }
 
@@ -278,6 +318,15 @@ public class GameManager : MonoBehaviour
             var agent = npc.GetComponent<NavMeshAgent>();
             if (agent != null)
                 agent.enabled = false;
+        }
+    }
+
+    public void ExcluirNPCMuerto(Transform npcMuerto)
+    {
+        if (npcs.Contains(npcMuerto))
+        {
+            npcs.Remove(npcMuerto);
+            Debug.Log($"{npcMuerto.name} eliminado de la lista de NPC activos.");
         }
     }
 }

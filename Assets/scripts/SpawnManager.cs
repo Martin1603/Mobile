@@ -13,9 +13,10 @@ public class SpawnerPersonajes : MonoBehaviour
     public float alturaAjuste = 1f;
 
     [HideInInspector] public List<Transform> posicionesIniciales = new List<Transform>();
+    [HideInInspector] public Dictionary<Transform, float> alturasIniciales = new Dictionary<Transform, float>();
 
     [Header("Referencia al GameManager")]
-    public GameManager gameManager; // <-- lo enlazamos desde el inspector
+    public GameManager gameManager;
 
     void Start()
     {
@@ -36,8 +37,8 @@ public class SpawnerPersonajes : MonoBehaviour
             if (t != null) Destroy(t.gameObject);
         }
         posicionesIniciales.Clear();
+        alturasIniciales.Clear();
 
-        // Lista para el GameManager
         List<Transform> npcSpawns = new List<Transform>();
 
         // Generar NPCs
@@ -50,11 +51,12 @@ public class SpawnerPersonajes : MonoBehaviour
             GameObject npc = Instantiate(prefabNPC, posicion, Quaternion.identity);
             npc.name = "NPC_" + (i + 1);
 
-            // Crear punto de spawn
             Transform punto = new GameObject("PuntoNPC_" + (i + 1)).transform;
-            punto.position = posicion;
+            punto.position = npc.transform.position;
             npcSpawns.Add(punto);
             posicionesIniciales.Add(punto);
+
+            alturasIniciales[npc.transform] = npc.transform.position.y; // Guardar altura inicial
         }
 
         // Generar jugador
@@ -66,24 +68,28 @@ public class SpawnerPersonajes : MonoBehaviour
         player.name = "Player";
 
         Transform puntoPlayer = new GameObject("PuntoPlayer").transform;
-        puntoPlayer.position = posicionPlayer;
+        puntoPlayer.position = player.transform.position;
         posicionesIniciales.Add(puntoPlayer);
 
-        // Pasar los datos al GameManager automáticamente
+        alturasIniciales[player.transform] = player.transform.position.y;
+
+        // Pasar los datos al GameManager
         if (gameManager != null)
         {
             gameManager.player = player.transform;
             gameManager.playerSpawn = puntoPlayer;
             gameManager.npcs = new List<Transform>();
             gameManager.npcSpawns = npcSpawns;
+            gameManager.alturasIniciales = alturasIniciales; // pasar alturas iniciales
 
-            // Agregar referencias de NPCs
             foreach (Transform npcTransform in npcSpawns)
             {
-                GameObject npc = GameObject.Find(npcTransform.name.Replace("Punto", ""));
-                if (npc != null)
-                    gameManager.npcs.Add(npc.transform);
+                GameObject npcGO = GameObject.Find(npcTransform.name.Replace("Punto", ""));
+                if (npcGO != null)
+                    gameManager.npcs.Add(npcGO.transform);
             }
+
+            gameManager.RegistrarPosicionesIniciales();
         }
 
         Debug.Log("Se generaron todos los personajes y se asignaron al GameManager.");
