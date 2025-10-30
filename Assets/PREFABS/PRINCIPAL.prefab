@@ -381,7 +381,7 @@ PrefabInstance:
     - target: {fileID: 9139419345009426422, guid: e6db0f37ad278134e99384754238e788,
         type: 3}
       propertyPath: m_Name
-      value: PERSONALIZACION 2 Variant
+      value: PRINCIPAL
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
