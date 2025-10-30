@@ -210,7 +210,7 @@ PrefabInstance:
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
       propertyPath: m_Text
-      value: DIENTES
+      value: TEETH
       objectReference: {fileID: 0}
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
@@ -1929,7 +1929,7 @@ PrefabInstance:
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
       propertyPath: m_Text
-      value: BIGOTES
+      value: WHISKERS
       objectReference: {fileID: 0}
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
@@ -6247,7 +6247,7 @@ PrefabInstance:
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
       propertyPath: m_Text
-      value: CABELLO
+      value: HAIR
       objectReference: {fileID: 0}
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
@@ -6603,6 +6603,7 @@ GameObject:
   - component: {fileID: 1137216574}
   - component: {fileID: 1137216573}
   - component: {fileID: 1137216572}
+  - component: {fileID: 1137216576}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -6696,6 +6697,103 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!82 &1137216576
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1137216571}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 1834d8346ae33e542bf2f4d2d0f87d9c, type: 3}
+  m_Resource: {fileID: 8300000, guid: 1834d8346ae33e542bf2f4d2d0f87d9c, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.2
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1172942520
 GameObject:
   m_ObjectHideFlags: 0
@@ -6766,7 +6864,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: CABELLO
+  m_Text: HAIR
 --- !u!222 &1172942523
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7289,7 +7387,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GAFAS
+  m_Text: GLASSES
 --- !u!222 &1256560200
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7386,7 +7484,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: OJOS
+  m_Text: EYES
 --- !u!222 &1395095204
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7768,7 +7866,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: GORRAS
+  m_Text: HATS
 --- !u!222 &1509395689
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -8245,7 +8343,7 @@ PrefabInstance:
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
       propertyPath: m_Text
-      value: GAFAS
+      value: GLASSES
       objectReference: {fileID: 0}
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
@@ -8276,8 +8374,18 @@ PrefabInstance:
         type: 3}
     - target: {fileID: 4409268246055563133, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 42.28257
+      objectReference: {fileID: 0}
+    - target: {fileID: 4409268246055563133, guid: 999d396a487ef6841b3577ec846c010f,
+        type: 3}
       propertyPath: m_SizeDelta.y
       value: 16.402
+      objectReference: {fileID: 0}
+    - target: {fileID: 4409268246055563133, guid: 999d396a487ef6841b3577ec846c010f,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 4409268246055563133, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
@@ -8916,9 +9024,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'BIGOTES
-
-'
+  m_Text: WHISKERS
 --- !u!222 &1772284918
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10664,9 +10770,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'PIEL
-
-'
+  m_Text: SKIN
 --- !u!222 &2133340057
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -10928,7 +11032,7 @@ PrefabInstance:
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
       propertyPath: m_Text
-      value: GORRAS
+      value: HATS
       objectReference: {fileID: 0}
     - target: {fileID: 3611549390243949296, guid: 999d396a487ef6841b3577ec846c010f,
         type: 3}
