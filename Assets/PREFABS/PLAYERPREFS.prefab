@@ -827,6 +827,11 @@ PrefabInstance:
       propertyPath: 'grupos.Array.data[4].objetos.Array.data[5]'
       value: 
       objectReference: {fileID: 8645352261469688413}
+    - target: {fileID: 3355217087540212066, guid: 4d8c59c7ed28f0f4c81340f261bfe651,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 8b7a082b8dc951b4ea5bc1e630ff9306, type: 2}
     - target: {fileID: 3858468300179062554, guid: 4d8c59c7ed28f0f4c81340f261bfe651,
         type: 3}
       propertyPath: aleatorizar

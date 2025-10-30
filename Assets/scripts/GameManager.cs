@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour
             if (!juegoTerminado)
             {
                 juegoTerminado = true;
-                SceneManager.LoadScene("ganar");
+                SceneManager.LoadScene("VICTORIA");
             }
             return;
         }

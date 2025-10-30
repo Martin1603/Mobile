@@ -17,8 +17,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/perder.unity
     guid: 631ede851ec5f33418e8e0c1f8c1a055
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ganar.unity
     guid: 27387c09fa6dab94fa73ec734b0e645a
+  - enabled: 1
+    path: Assets/Scenes/VICTORIA.unity
+    guid: cb62b68d651eff54e92b17fac539b889
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
