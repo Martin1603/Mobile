@@ -141,7 +141,9 @@ public class GameManager : MonoBehaviour
         Vector3 centro = chairsScript.transform.position;
         float tiempoRotacion = Random.Range(2f, 10f);
         float tiempoTranscurrido = 0f;
-        float velocidadRotacion = 15f;
+        float velocidadBase = 20f;
+        float incrementoVelocidad = 5f; // puedes ajustar este valor
+        float velocidadRotacion = velocidadBase + (rondaActual - 1) * incrementoVelocidad;
 
         List<NavMeshAgent> agentes = new List<NavMeshAgent>();
         List<Rigidbody> rigidbodies = new List<Rigidbody>();
@@ -289,6 +291,9 @@ public class GameManager : MonoBehaviour
         int cantidad = vivos.Count;
         if (cantidad == 0) return;
 
+        // ?? Generar un desplazamiento angular aleatorio entre 0 y 360 grados
+        float offsetAngular = Random.Range(0f, Mathf.PI * 2f);
+
         for (int i = 0; i < cantidad; i++)
         {
             Transform personaje = vivos[i];
@@ -296,8 +301,8 @@ public class GameManager : MonoBehaviour
             float radio = radiosOriginales.ContainsKey(personaje) ? radiosOriginales[personaje] : radioInicial;
             float altura = alturasIniciales.ContainsKey(personaje) ? alturasIniciales[personaje] : personaje.position.y;
 
-            // Recalcular ángulo equitativo
-            float angulo = i * Mathf.PI * 2f / cantidad;
+            // Distribución equitativa + desplazamiento aleatorio
+            float angulo = offsetAngular + i * Mathf.PI * 2f / cantidad;
 
             Vector3 nuevaPos = new Vector3(
                 centro.x + radio * Mathf.Cos(angulo),
@@ -307,6 +312,7 @@ public class GameManager : MonoBehaviour
 
             personaje.position = nuevaPos;
 
+            // Girar hacia el centro
             Vector3 dir = (centro - personaje.position);
             dir.y = 0;
             if (dir.sqrMagnitude > 0.01f)
