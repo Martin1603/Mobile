@@ -11324,6 +11324,11 @@ PrefabInstance:
       propertyPath: _Editor_OnValidateTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4204886608589591821, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e90d0849dac754a4bbd3ecbb2029fbda, type: 2}
     - target: {fileID: 4759288687467306562, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
         type: 3}
       propertyPath: partes.Array.data[0].objetos.Array.size

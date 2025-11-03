@@ -10,6 +10,8 @@ public class Enemy : MonoBehaviour
     [Header("Referencias")]
     public Animator animator; // <-- Nuevo: referencia al Animator del enemigo
 
+    public Animator arma;
+
     private GameManager gameManager;
     private Chairs chairsScript;
     private bool rondaEnProgreso = false;
@@ -56,6 +58,7 @@ public class Enemy : MonoBehaviour
         if (animator != null)
         {
             animator.SetTrigger("matar");
+            arma.SetTrigger("matar");
         }
 
         // Espera antes de matar (permite que se vea la animación)
