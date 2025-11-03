@@ -120,7 +120,7 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.32
-  m_Height: 1.9
+  m_Height: 1.99
   m_Direction: 1
   m_Center: {x: 0, y: 0.48, z: 0}
 --- !u!54 &2069893733313939667
@@ -323,7 +323,27 @@ PrefabInstance:
     - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
         type: 3}
       propertyPath: grosor
-      value: 0.025
+      value: 0.0087
+      objectReference: {fileID: 0}
+    - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: colorBorde.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: colorBorde.b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: colorBorde.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: colorBorde.r
+      value: 0.09087229
       objectReference: {fileID: 0}
     - target: {fileID: 6417712532569886778, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
         type: 3}

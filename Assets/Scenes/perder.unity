@@ -520,6 +520,11 @@ PrefabInstance:
       propertyPath: _Editor_OnValidateTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5571333878823001057, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6417712532569886778, guid: 0b938fb5428a40c4ab083bb55ea96e4b,
         type: 3}
       propertyPath: m_Controller

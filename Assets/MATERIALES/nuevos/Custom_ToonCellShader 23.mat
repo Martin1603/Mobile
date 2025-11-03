@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Custom_ToonCellShader 5
+  m_Name: Custom_ToonCellShader 23
   m_Shader: {fileID: 4800000, guid: 40a3604ad426a2f4ba98eb3afb93a165, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -25,9 +25,9 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Cutoff: 0.121
+    - _Cutoff: 0.065
     m_Colors:
-    - _Color: {r: 0.23333903, g: 0.036445353, b: 0.3679245, a: 1}
-    - _ShadeColor: {r: 0.43147972, g: 0, b: 0.7264151, a: 1}
+    - _Color: {r: 0.254717, g: 0.254717, b: 0.254717, a: 1}
+    - _ShadeColor: {r: 0.92941177, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
