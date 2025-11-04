@@ -11,6 +11,7 @@ Library: C:\Users\USUARIO\Desktop\Unity_games\Mobile\Temp\BurstOutput\tempburstl
 --assembly-defines=Cinemachine;
 --assembly-defines=Mono.Security;
 --assembly-defines=mscorlib;
+--assembly-defines=OutlineFx;
 --assembly-defines=System.Configuration;
 --assembly-defines=System.Core;
 --assembly-defines=System;
@@ -66,6 +67,7 @@ Library: C:\Users\USUARIO\Desktop\Unity_games\Mobile\Temp\BurstOutput\tempburstl
 --assembly-defines=Cinemachine;
 --assembly-defines=Mono.Security;
 --assembly-defines=mscorlib;
+--assembly-defines=OutlineFx;
 --assembly-defines=System.Configuration;
 --assembly-defines=System.Core;
 --assembly-defines=System;
